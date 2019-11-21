@@ -1,0 +1,55 @@
+<h1>Chat!</h1>
+<ul id="messages"></ul>
+
+<form id="comment-form">
+    <label>Nome:</label>
+<input type="text" id="author" name="author">
+<label>Message:</label>
+<input id="comment" name="comment">
+<button type="submit">Enviar</button>
+</form>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+    const socket = io('http://localhost:3000');
+
+    const messageForm = document.getElementById('comment-form')
+
+    messageForm.onsubmit = function(e){
+        e.preventDefault();
+        const author = document.getElementById('author').value
+        const comment = document.getElementById('comment').value
+        const data = {author, comment}
+
+        renderMessage(data)
+
+        socket.emit('sendMessage', data)
+
+        document.getElementById('author').disabled
+        document.getElementById('comment').value = ""    
+
+    }
+
+    socket.on('messagem', function(content){
+	    renderMessage(content)
+    })
+
+    const messagesList = document.getElementById('messages')
+    const renderMessage = (message) => {
+        const element = document.createElement('li')
+        element.innerHTML = `<strong>${message.author}</strong>: ${message.comment}`
+        messagesList.append(element)
+    }
+
+</script>
+
+<style>
+    #comment-form{
+        margin-top: 100px;
+    }
+    #comment-form input{
+        display: block;
+    }
+</style>
+
